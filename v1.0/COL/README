@@ -1,0 +1,3 @@
+* cd to bin
+* Run as _ROOT_
+	* ./script pm_file image_file vm_types

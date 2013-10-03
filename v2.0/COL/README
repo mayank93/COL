@@ -1,0 +1,15 @@
+* cd to bin
+* Run as "ROOT"
+	* ./script pm_file image_file vm_types
+
+
+
+
+The code needs following to be installed on your computer before executing it.
+sqlite3
+libvirt
+rbd
+rados
+ceph 
+
+If not it try to install most of them but not all.

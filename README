@@ -1,0 +1,177 @@
+#########################################################
+#       Virtualization Orchestration Layer		#
+#       By Mayank Gupta                                 #
+#       mayankrocks.1993@gmail.com                      #
+#       mayank.g@students.iiit.ac.in      	        #
+#########################################################
+
+
+In today’s world, Hypervisor is the new OS and Virtual Machines are the new processes. Many system programmers are familiar with the low level APIs that are exposed by the operating systems like Linux and Microsoft Windows. These APIs can be used to take control of the OS programmatically and help in developing management tools. Similar to the OS, Hypervisors expose APIs that can be invoked to manage the virtualized environments.Typical APIs include provisioning, de-provisioning, changing the state of VMs, configuring the running VMs and so on. While it may be easy to deal with one Hypervisor running on a physical server, it is complex to concurrently deal with a set of Hypervisors running across the datacenter. In a dynamic environment, this is a critical requirement to manage the resources and optimize the infrastructure. This is the problem that we try to solve in this project.
+
+It is a fabric that can coordinate the provisioning of compute and storage resources by negotiating with a set of Hypervisors running across physical servers in the datacenter.
+
+
+The program takes as input following three files:
+->physicalmachine_file 
+	Contains details about machines which are to used for creating VM,in the format specified in file "physicalMachineFileFormat"i.
+	All these machine should provide passwordless ssh to every other machine in this list.
+	Should have following installed:
+		->sqlite3
+		->libvirt
+		->rbd
+		->rados
+		->ceph
+		->Ceph is to be configured on all machines and a machine on which the program will run need to be made ceph-monitor.
+
+->image_file 
+	Contains a list of Images(full path) to be used for spawning VMs,in the format specified in file "imageFileFormat".
+
+->vm_types
+	Contains details about types of VM,in the format specified in file "vmTypesFileFormat".
+
+
+To execute:
+	->cd to bin of the desired version
+	->Run as "ROOT"
+		./script physicalMachine_file image_file vm_types
+
+
+
+There are two version of this 1.0 and 2.0 ,version1.0 only deals with creating/destroying VMs, but without hardisk, version2.0 give you ability to attach/detach hardisks to these VMs.
+
+The script setups a flaskServer which help to serve request through REST API.
+Each REST API call returns a json object
+API Specification:
+
+v1.0
+	VM APIs:
+	->VM_Creation:
+		Argument: name, instance_type.
+		Return: vmid(+ if successfully created, 0 if failed) { 
+		"vmid":38201 
+		}
+		URL: http://server/vm/create?name=test_vm&instance_type=type&image_id=image_id
+
+	->VM_Query
+		Argument: vmid
+		Return: instance_type, name, id, pmid {
+			"vmid":38201,
+			"name":"test_vm",
+			"instance_type":3,
+			"pmid": 2
+		}
+		URL: http://server/vm/query?vmid=vmid
+
+	->VM_Destroy
+		Argument: vmid
+		Return: 1 for success and 0 for failure. { 
+			"status":1 
+		}
+		URL: http://server/vm/destroy?vmid=vmid
+
+	->VM_Type
+		Argument: NA
+		Return: tid, cpu, ram, disk {
+			"types": [
+			{
+				"tid": 1,
+				"cpu": 1,
+				"ram": 512,
+				"disk": 1
+			},
+			{
+				"tid": 2,
+				"cpu": 2,
+				"ram": 1024,
+				"disk": 2
+			},
+			{
+				"tid": 3,
+				"cpu": 4,
+				"ram": 2048,
+				"disk": 3
+			}
+			]
+		}
+		URL: http://server/vm/types
+
+	Image Service APIs:
+
+	->List_Images
+		Argument: NA
+		Return: id, name { 
+			"images":[
+				{ "
+					id": 100, 
+					"name": "Ubuntu-12.04-amd64" 
+				}, 
+				{ 
+					"id":101, 
+					"name": "Fedora-17-x86_64" 
+				}
+			]
+		}
+		URL: http://server/image/list
+
+v2.0
+Along with version1.0 API it has the following more
+
+	Block Storage APIs
+
+	->Volume_Creation:
+		Argument: name, size in GB.
+		Return: volumeid(+ if successfully created, 0 if failed)
+		{
+			volumeid:38201
+		}
+		URL: http://server/volume/create?name=test­volume&size=10
+
+	->Volume_Query
+		Argument: volumeid
+		Return: (if id exists) volumeid, name, size, status (attached/available/deleted),
+		vmid (if status is attached)
+		{
+			"volumeid":38201,
+			"name":"test_volume",
+			"size":3
+			"status":"attached"
+			“vmid” :1011
+		}
+		OR
+		{
+			"volumeid":38201,
+			"name":"test_volume",
+			"size":3
+			"status":"available"
+		}
+		OR
+		If id doesn’t exist
+		{
+			"error ": "volumeid : xxxx does not exist"
+		}
+		URL: http://server/volume/query?volumeid=volumeid
+
+	->Volume_Destroy
+		Argument: vmid
+		Return: 1 for success and 0 for failure.
+		{
+			"status":1
+		}
+		URL: http://server/volume/destroy?volumeid=volumeid
+
+	->Volume_Attach
+		Argument: vmid, volumeid
+		Return: 1 for success and 0 for failure.
+		{
+			"status":1
+		}
+		URL: http://server/volume/attach?vmid=vmid&volumeid=volumeid
+ 
+	->Volume_Detach
+		Argument: volumeid
+		Return: 1 for success and 0 for failure.
+		{
+		"status":1
+		}
+		URL: http://server/volume/detach?volumeid=volumeid
+

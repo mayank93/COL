@@ -1,0 +1,46 @@
+#!/bin/bash
+
+#script file copied
+
+readarray <<HERE
+python-libvirt
+qemu-kvm
+python-flask
+sqlite3
+HERE
+
+updateFlag=0
+
+for a in "${MAPFILE[@]}"; do
+    temp=${a%?}
+    echo "Checking if $temp is installed"
+    dpkg -s $temp &> /dev/null 
+    if [ $? != 0 ]; then
+        echo "Package $temp is not installed. Attempting to install... "
+        if [ $updateFlag == 0 ]; then
+            sudo apt-get update
+            updateFlag=1
+        fi
+        sudo apt-get --force-yes --yes install $temp
+    fi
+done
+
+
+echo "Checking if ceph-deploy is installed"
+dpkg -s ceph-deploy &> /dev/null
+if [ $? != 0 ]; then
+    echo "Package ceph-deply is not installed. Attempting to install... "
+    wget -q -O- 'https://ceph.com/git/?p=ceph.git;a=blob_plain;f=keys/release.asc' | sudo apt-key add -
+    echo deb http://ceph.com/debian-dumpling/ $(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/ceph.list
+    sudo apt-get update
+    sudo apt-get --force-yes --yes install ceph-deploy
+fi
+
+echo "Checking if ceph is installed"
+dpkg -s ceph-deploy &> /dev/null
+if [ $? != 0 ]; then
+    echo "Ceph is not installed and configured."
+    echo "If you believe this is an error, please run \"python flaskServer.py $1 $2 $3\""
+fi
+
+python flaskServer.py $1 $2 $3

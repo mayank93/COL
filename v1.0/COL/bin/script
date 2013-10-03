@@ -1,0 +1,3 @@
+#!/bin/bash
+apt-get install --force-yes -y sqlite3
+python flaskServer.py $1 $2 $3
