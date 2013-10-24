@@ -37,7 +37,7 @@ To execute:
 
 
 
-There are two version of this 1.0 and 2.0 ,version1.0 only deals with creating/destroying VMs, but without hardisk, version2.0 give you ability to attach/detach hardisks to these VMs.
+There are three version of this 1.0 and 2.0 and 3.0 ,version1.0 only deals with creating/destroying VMs, but without hardisk, version2.0 give you ability to attach/detach hardisks to these VMs. version3.0 provides a gui for this api.
 
 The script setups a flaskServer which help to serve request through REST API.
 Each REST API call returns a json object
@@ -174,4 +174,5 @@ Along with version1.0 API it has the following more
 		"status":1
 		}
 		URL: http://server/volume/detach?volumeid=volumeid
-
+v3.0
+	To be updated
