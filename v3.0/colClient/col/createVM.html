@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<!-- Mirrored from detail.herokuapp.com/index.html by HTTrack Website Copier/3.x [XR&CO'2008], Wed, 10 Jul 2013 20:51:54 GMT -->
+<head>
+	<title>Detail Admin - Home</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+    <!-- bootstrap -->
+    <link href="css/bootstrap/bootstrap.css" rel="stylesheet" />
+    <link href="css/bootstrap/bootstrap-responsive.css" rel="stylesheet" />
+    <link href="css/bootstrap/bootstrap-overrides.css" type="text/css" rel="stylesheet" />
+
+    <!-- libraries -->
+    <link href="css/lib/jquery-ui-1.10.2.custom.css" rel="stylesheet" type="text/css" />
+    <link href="css/lib/font-awesome.css" type="text/css" rel="stylesheet" />
+
+    <!-- global styles -->
+    <link rel="stylesheet" type="text/css" href="css/layout.css">
+    <link rel="stylesheet" type="text/css" href="css/elements.css">
+    <link rel="stylesheet" type="text/css" href="css/icons.css">
+
+    <!-- this page specific styles -->
+    <link rel="stylesheet" href="css/compiled/index.css" type="text/css" media="screen" />    
+
+    <!-- open sans font -->
+    <link href='../fonts.googleapis.com/css5c84.css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- lato font -->
+    <link href='../fonts.googleapis.com/cssef21.css?family=Lato:300,400,700,900,300italic,400italic,700italic,900italic' rel='stylesheet' type='text/css'>
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+<script type='text/javascript'>
+    function getJson() {
+        var instance_type = document.getElementById('instance_type').value;
+        var name = document.getElementById('name').value;
+        var image_id = document.getElementById('image_id').value;
+        $('#enter').empty();
+        var re = new RegExp('[0-9]+');
+        if(!re.exec(image_id)){
+                $('<p align="center"><h3>enter valid image_id</h3></p>').appendTo('#enter'); 
+                return;
+        }
+        sendData={instance_type:instance_type,name:name,image_id:image_id}
+        console.log(image_id)
+        $.ajax({
+        data:sendData,
+        dataType: 'jsonp',
+        contentType: "application/json",
+        jsonp: 'jsonp_callback',
+        url: 'http://localhost:5000/vm/create',
+        success: function (data) {
+        console.log(data);
+        $('#enter').empty();
+//      var div = document.getElementById('enter');
+        var content='<table class="table table-striped"><tbody>'
+//      for(var i=0;i<data.length;i++){
+        for(var i in data){
+        console.log(data[i]);
+        console.log(i);
+        content+='<tr><td>'+i+'</td><td>'+data[i]+'</td></tr>'
+        }
+        content+='</tbody></table>'
+        $(content).appendTo('#enter'); 
+//      div.innerHTML = div.innerHTML
+        data=JSON.stringify(data);
+        console.log(data);
+  },
+});
+}
+ </script>
+
+</head>
+<body>
+
+    <!-- navbar -->
+    <div class="navbar navbar-inverse">
+        <div class="navbar-inner">
+            <button type="button" class="btn btn-navbar visible-phone" id="menu-toggler">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+            <a class="brand" href="index.html"><b>MY CLO</b></a>
+        </div>
+    </div>
+    <!-- end navbar -->
+
+    <!-- sidebar -->
+    <div id="sidebar-nav">
+        <ul id="dashboard-menu">
+            <li class="active">
+                <div class="pointer">
+                    <div class="arrow"></div>
+                    <div class="arrow_border"></div>
+                </div>
+                <a href="index.html">
+                    <i class="icon-home"></i>
+                    <span>Home</span>
+                </a>
+            </li>            
+            <li>
+                <a class="dropdown-toggle" href="#">
+                    <i class="icon-group"></i>
+                    <span>Volume</span>
+                    <i class="icon-chevron-down"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="./createVolume.html">Create Volume</a></li>
+                    <li><a href="./destroyVolume.html">Destroy Volume</a></li>
+                    <li><a href="./attachVolume.html">Attach Volume</a></li>
+                    <li><a href="./detachVolume.html">Detach Volume</a></li>
+                    <li><a href="./queryVolume.html">Query Volume</a></li>
+                </ul>
+            <li>
+                <a class="dropdown-toggle" href="#">
+                    <i class="icon-group"></i>
+                    <span>VM</span>
+                    <i class="icon-chevron-down"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="./createVM.html">Create VM</a></li>
+                    <li><a href="./destroyVM.html">Destroy VM</a></li>
+                    <li><a href="./queryVM.html">Query VM</a></li>
+                    <li><a href="./vmTypes.html">VM Types</a></li>
+                </ul>
+            </li>
+            <li>
+                <a class="dropdown-toggle" href="#">
+                    <i class="icon-edit"></i>
+                    <span>Images</span>
+                    <i class="icon-chevron-down"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="./imageTypes.html">Image Types</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <!-- end sidebar -->
+
+
+	<!-- main container -->
+    <div class="content">
+
+        <div class="container-fluid">
+		<div class="span12" align="center" style="margin:20px 20px 10% 20px">
+                       <input id="instance_type" type="text" placeholder="Enter Instance Type"><br/>
+                       <input id="name" type="text" placeholder="Enter Name"><br/>
+                       <input id="image_id" type="text" placeholder="Enter Imageid"><br/>
+                        <button class="btn btn-primary" onclick="getJson()" type="button">Submit</button>
+                </div>
+                <div class="span2"></div>
+                <div class="span6">
+                        <div id="enter">
+                        </div>
+                </div>
+
+        </div>
+    </div>
+
+
+	<!-- scripts -->
+    <script src="js/jquery-latest.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery-ui-1.10.2.custom.min.js"></script>
+    <!-- knob -->
+    <script src="js/jquery.knob.js"></script>
+    <!-- flot charts -->
+    <script src="js/jquery.flot.js"></script>
+    <script src="js/jquery.flot.stack.js"></script>
+    <script src="js/jquery.flot.resize.js"></script>
+    <script src="js/theme.js"></script>
+
+</body>
+
+</html>
